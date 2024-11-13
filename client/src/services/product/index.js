@@ -23,6 +23,24 @@ class ProductService {
             throw error;
         }
     }
+    create = async (data) => {
+        try {
+            const response = await axios.post(`${this.apiUrl}/create`, data);
+            return response.data;
+        } catch (error) {
+            console.error("Error creating product:", error);
+            throw error;
+        }
+    }
+    delete = async (id) => {
+        try {
+            const response = await axios.delete(`${this.apiUrl}/delete/${id}`);
+            return response.data;
+        } catch (error) {
+            console.error("Error deleting product:", error);
+            throw error;
+        }
+    }
 }
 
 export default new ProductService();

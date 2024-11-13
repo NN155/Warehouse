@@ -1,14 +1,19 @@
-import React from 'react';
-import { Box, Heading } from '@chakra-ui/react';
+import React, { useState, useEffect } from 'react';
+import { Box, Heading, Button } from '@chakra-ui/react';
 import { ProductService } from '../../services';
 import { useParams } from 'react-router-dom';
 import { ProductComponents } from '../../components';
+import { useDisclosure } from '@chakra-ui/react';
+import { AddIcon } from '@chakra-ui/icons';
+import AddCategoryModal from '../../components/product/AddCategoryModal';
 
 const ProductPage = () => {
     const { id } = useParams();
-    const [products, setProducts] = React.useState([]);
+    const [products, setProducts] = useState([]);
+    const [newCategory, setNewCategory] = useState('');
+    const { isOpen, onOpen, onClose } = useDisclosure();
 
-    React.useEffect(() => {
+    useEffect(() => {
         ProductService.getByStore(id).then((data) => {
             setProducts(data);
         });
@@ -26,15 +31,38 @@ const ProductPage = () => {
         });
     };
 
-    const onAddProduct = (newProduct, category) => {
-        const productWithCategory = { ...newProduct, category };
-        ProductService.create(productWithCategory).then((data) => {
+    const onAdd = (product) => {
+        ProductService.create(product).then((data) => {
             setProducts((prev) => [...prev, data]);
         });
     };
 
+    const onDelete = (id) => {
+        ProductService.delete(id).then(() => {
+            setProducts((prev) => prev.filter((p) => p._id !== id));
+        });
+    };
+
+    const handleAddNewCategory = () => {
+        if (!newCategory.trim()) return;
+
+        const newProduct = {
+            name: '',
+            manufacturer: '',
+            price: 0,
+            quantity: 0,
+            arrivalDate: new Date(),
+            category: newCategory.trim(),
+            store: id,
+        };
+
+        onAdd(newProduct);
+        setNewCategory('');
+        onClose();
+    };
+
     return (
-        <Box p={8} bg="gray.100">
+        <Box p={8} bg="gray.100" position="relative">
             <Heading textAlign="center" mb={8}>Inventory for Store</Heading>
 
             {Object.keys(groupedProducts).map((category) => (
@@ -43,9 +71,45 @@ const ProductPage = () => {
                     category={category}
                     products={groupedProducts[category]}
                     onSave={onSave}
-                    onAddProduct={onAddProduct}
+                    onAdd={onAdd}
+                    onDelete={onDelete}
+                    data={{
+                        store: id,
+                        arrivalDate: new Date(),
+                        price: 0,
+                        quantity: 0,
+                        name: '',
+                        manufacturer: '',
+                    }}
                 />
             ))}
+
+
+            <Button
+                colorScheme="blue"
+                onClick={onOpen}
+                position="absolute"
+                top="20px"
+                right="20px"
+                borderRadius="50%"
+                width="50px"
+                height="50px"
+                fontSize="2xl"
+                display="flex"
+                justifyContent="center"
+                alignItems="center"
+            >
+                <AddIcon boxSize={6} />
+            </Button>
+
+
+            <AddCategoryModal
+                isOpen={isOpen}
+                onClose={onClose}
+                newCategory={newCategory}
+                setNewCategory={setNewCategory}
+                onAddCategory={handleAddNewCategory}
+            />
         </Box>
     );
 };

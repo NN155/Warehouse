@@ -1,5 +1,4 @@
 const Product = require('../../../model/product');
-const mongoose = require('mongoose');
 
 const update = async ({ _id, ...rest }) => {
     try {

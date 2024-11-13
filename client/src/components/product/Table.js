@@ -1,8 +1,10 @@
 import React from 'react';
 import { Table as Tb, Thead, Tbody, Tr, Th, Button } from '@chakra-ui/react';
 import Row from './Row';
+import { ProductContext } from './Category';
 
-const Table = ({ products, onSave, onAdd }) => {
+const Table = () => {
+    const { products, category, data } = React.useContext(ProductContext);
     return (
         <div>
             <Tb variant="simple" bg="white">
@@ -18,9 +20,12 @@ const Table = ({ products, onSave, onAdd }) => {
                 </Thead>
                 <Tbody>
                     {products.map((product) => (
-                        <Row key={product._id} product={product} onSave={onSave} onAdd={onAdd} />
+                        <Row key={product._id} product={product} />
                     ))}
-                    <Row product={{}} onSave={onSave} onAdd={onAdd} />
+                    <Row product={{
+                        category,
+                        ...data,
+                    }} />
                 </Tbody>
             </Tb>
         </div>

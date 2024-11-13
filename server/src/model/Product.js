@@ -2,10 +2,10 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const ProductSchema = new Schema({
-  name: { type: String, required: true },
+  name: { type: String },
   category: { type: String, required: true },
   manufacturer: { type: String },
-  price: { type: Number, required: true },
+  price: { type: Number, default: 0, required: true },
   quantity: { type: Number, default: 0 },
   arrivalDate: { type: Date, required: true },
   expirationDate: { type: Date },
